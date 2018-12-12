@@ -13,7 +13,7 @@ import org.mydotey.java.collection.CollectionExtension;
 public interface StringExtension {
 
     static final String EMPTY = "";
-    static final String NULL = String.valueOf(null);
+    static final String NULL = String.valueOf((Object) null);
 
     static boolean isEmpty(String obj) {
         return obj == null || obj.isEmpty();
@@ -55,6 +55,16 @@ public interface StringExtension {
 
     static String intern(String value) {
         return value == null ? null : value.intern();
+    }
+
+    static boolean equalsIgnoreCase(String s1, String s2) {
+        if (s1 == s2)
+            return true;
+
+        if (s1 == null || s2 == null)
+            return false;
+
+        return s1.equalsIgnoreCase(s2);
     }
 
     static String trim(String s, char... chars) {
@@ -205,16 +215,6 @@ public interface StringExtension {
             return sb.toString();
 
         return sb.substring(0, sb.length() - separator.length());
-    }
-
-    static boolean equalsIgnoreCase(String s1, String s2) {
-        if (s1 == s2)
-            return true;
-
-        if (s1 == null || s2 == null)
-            return false;
-
-        return s1.equalsIgnoreCase(s2);
     }
 
 }

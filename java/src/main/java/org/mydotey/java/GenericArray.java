@@ -62,4 +62,38 @@ public class GenericArray<T> implements Iterable<T> {
             throw new IndexOutOfBoundsException();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((_data == null) ? 0 : _data.hashCode());
+        result = prime * result + _length;
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GenericArray other = (GenericArray) obj;
+        if (_data == null) {
+            if (other._data != null)
+                return false;
+        } else if (!_data.equals(other._data))
+            return false;
+        if (_length != other._length)
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return _data.toString();
+    }
+
 }

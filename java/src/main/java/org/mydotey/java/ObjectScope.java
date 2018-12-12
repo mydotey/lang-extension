@@ -9,7 +9,7 @@ public class ObjectScope<T> {
 
     private ThreadLocal<T> _current = new ThreadLocal<>();
 
-    private CloseableScope _scope = new CloseableScope();
+    private CloseableScope _scope = new CloseableScope(this);
 
     public ObjectScope() {
         this(null);
@@ -29,11 +29,17 @@ public class ObjectScope<T> {
         return _scope;
     }
 
-    public class CloseableScope implements AutoCloseable {
+    public static class CloseableScope implements AutoCloseable {
+
+        private ObjectScope<?> _objectScope;
+
+        public CloseableScope(ObjectScope<?> objectScope) {
+            _objectScope = objectScope;
+        }
 
         @Override
         public void close() {
-            ObjectScope.this._current.set(null);
+            _objectScope._current.set(null);
         }
 
     }

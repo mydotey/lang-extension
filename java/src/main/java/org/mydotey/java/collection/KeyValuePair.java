@@ -1,5 +1,7 @@
 package org.mydotey.java.collection;
 
+import org.mydotey.java.StringExtension;
+
 /**
  * Created by Qiang Zhao on 10/05/2016.
  */
@@ -14,6 +16,22 @@ public class KeyValuePair<K, V> {
 
     public KeyValuePair(K key, V value) {
         this.key = key;
+        this.value = value;
+    }
+
+    public K getKey() {
+        return key;
+    }
+
+    public void setKey(K key) {
+        this.key = key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
+    public void setValue(V value) {
         this.value = value;
     }
 
@@ -51,7 +69,11 @@ public class KeyValuePair<K, V> {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", key, value);
+        if (key == null && value == null)
+            return null;
+
+        return String.format("%s: %s", StringExtension.nullToEmpty(StringExtension.toString(key)),
+                StringExtension.nullToEmpty(StringExtension.toString(value)));
     }
 
 }

@@ -1,7 +1,5 @@
 package org.mydotey.java;
 
-import org.slf4j.LoggerFactory;
-
 /**
  * Created by Qiang Zhao on 10/05/2016.
  */
@@ -15,7 +13,7 @@ public interface ThreadExtension {
         try {
             Thread.sleep(ms, nanos);
         } catch (InterruptedException ex) {
-            LoggerFactory.getLogger(ThreadExtension.class).warn("Thread sleep interrupted.", ex);
+            throw new InterruptedRuntimeException(ex);
         }
     }
 
