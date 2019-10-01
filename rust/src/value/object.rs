@@ -3,6 +3,10 @@ use std::fmt::{ Debug, Formatter, Result };
 use std::any::{ type_name, Any, TypeId };
 use std::collections::hash_map::DefaultHasher;
 
+pub trait ObjectConstraits: 'static + Hash + PartialEq + Eq + Debug + Clone { }
+
+impl<T: 'static + Hash + PartialEq + Eq + Debug + Clone> ObjectConstraits for T { }
+
 pub trait Object: 'static {
 
     fn hashcode(&self) -> u64;
@@ -27,7 +31,7 @@ pub trait Object: 'static {
 
 }
 
-impl<T: 'static + Hash + PartialEq + Eq + Debug + Clone> Object for T {
+impl<T: ObjectConstraits> Object for T {
 
     fn hashcode(&self) -> u64 {
         let mut hasher = DefaultHasher::default();
