@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::any::TypeId;
 
 use super::object::*;
 
@@ -14,8 +15,17 @@ impl ImmutableObject {
         }
     }
 
-    pub fn value(&self) -> Box<dyn Object> {
+    pub fn raw_object(&self) -> Box<dyn Object> {
         self.value.as_ref().clone()
+    }
+
+    pub fn downcast_raw<T: 'static + Clone>(&self) -> Option<T> {
+        if self.value.as_ref().as_ref().raw_type_id() == TypeId::of::<T>() {
+            let r =  unsafe { &*(self.value.as_ref().as_ref() as *const dyn Object as *const T) };
+            Some(r.clone())
+        } else {
+            None
+        }
     }
 }
 
@@ -37,6 +47,15 @@ mod tests {
     fn object() {
         assert_eq!(ImmutableObject::new("key"), ImmutableObject::new("key"));
         assert_ne!(ImmutableObject::new("key"), ImmutableObject::new("value"));
+    }
+
+    #[test]
+    fn downcast() {
+        let s = "key";
+        let obj = ImmutableObject::new(s);
+        let s2: &str = obj.downcast_raw().unwrap();
+        println!("s: {}, s2: {}", s, s2);
+        assert_eq!(s, s2);
     }
 
     #[test]

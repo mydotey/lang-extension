@@ -1,6 +1,6 @@
 use std::hash::{ Hash, Hasher };
 use std::fmt::{ Debug, Formatter, Result };
-use std::any::{ type_name, Any };
+use std::any::{ type_name, Any, TypeId };
 use std::collections::hash_map::DefaultHasher;
 
 pub trait Object: 'static {
@@ -17,8 +17,12 @@ pub trait Object: 'static {
 
     fn as_any_mut(&mut self) -> &mut dyn Any;
 
-    fn type_name(&self) -> &'static str {
+    fn raw_type_name(&self) -> &'static str {
         type_name::<Self>()
+    }
+
+    fn raw_type_id(&self) -> TypeId {
+        TypeId::of::<Self>()
     }
 
 }
@@ -82,6 +86,33 @@ impl Clone for Box<dyn Object> {
     }
 }
 
+pub fn downcast_raw<T: 'static + Clone>(obj: Box<dyn Object>) -> Option<T> {
+    if obj.as_ref().raw_type_id() == TypeId::of::<T>() {
+        let r =  unsafe { &*(obj.as_ref() as *const dyn Object as *const T) };
+        Some(r.clone())
+    } else {
+        None
+    }
+}
+
+pub fn downcast_ref<T: 'static>(obj: &dyn Object) -> Option<&T> {
+    if obj.raw_type_id() == TypeId::of::<T>() {
+        let r =  unsafe { &*(obj as *const dyn Object as *const T) };
+        Some(r)
+    } else {
+        None
+    }
+}
+
+pub fn downcast_mut<T: 'static>(obj: &mut dyn Object) -> Option<&mut T> {
+    if obj.raw_type_id() == TypeId::of::<T>() {
+        let r =  unsafe { &mut *(obj as *mut dyn Object as *mut T) };
+        Some(r)
+    } else {
+        None
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -134,8 +165,8 @@ mod tests {
             b: 2
         };
         let t: Box<dyn Object> = Box::new(s);
-        println!("Box<Object>: {}", t.type_name());
-        println!("Object: {}", t.as_ref().type_name());
+        println!("Box<Object>: {}", t.raw_type_name());
+        println!("Object: {}", t.as_ref().raw_type_name());
     }
 
     #[test]
@@ -170,6 +201,49 @@ mod tests {
         t.as_mut().as_any_mut().downcast_mut::<S1>().unwrap().a = 11;
         println!("s: {:?}", t.as_any_mut().downcast_mut::<Box<dyn Object>>().unwrap());
         println!("s: {:?}", t.as_ref().as_any().downcast_ref::<S1>().unwrap());
+    }
+
+    #[test]
+    fn downcast_raw() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let obj: Box<dyn Object> = Box::new(s.clone());
+        let s2 = super::downcast_raw::<S1>(obj).unwrap();
+        println!("s: {:?}", s);
+        println!("s2: {:?}", s2);
+        assert_eq!(s, s2);
+    }
+
+    #[test]
+    fn downcast_ref() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let obj: Box<dyn Object> = Box::new(s.clone());
+        let s2 = super::downcast_ref::<S1>(obj.as_ref()).unwrap();
+        println!("s: {:?}", s);
+        println!("s2: {:?}", s2);
+        assert_eq!(s, *s2);
+    }
+
+    #[test]
+    fn downcast_mut() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let mut obj: Box<dyn Object> = Box::new(s.clone());
+        {
+                let s2 = super::downcast_mut::<S1>(obj.as_mut()).unwrap();
+                s2.a = 10;
+                println!("s2: {:?}", s2);
+        }
+        println!("s: {:?}", s);
+        println!("s2: {:?}", obj);
+        assert_eq!(10, super::downcast_ref::<S1>(obj.as_ref()).unwrap().a);
     }
 
     #[test]
