@@ -1,0 +1,16 @@
+[package]
+name = "lang_extension"
+version = "0.1.1"
+authors = ["Qiang Zhao <koqizhao@outlook.com>"]
+description = "Rust Lang Extension"
+edition = "2018"
+license = "Apache-2.0"
+homepage = "https://github.com/mydotey/lang-extension/tree/master/rust"
+repository = "https://github.com/mydotey/lang-extension"
+readme = "README.md"
+keywords = ["lang", "extension", "object"]
+categories = ["rust-patterns"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
