@@ -1,6 +1,6 @@
 use std::hash::{ Hash, Hasher };
 use std::fmt::{ Debug, Formatter, Result };
-use std::any::{ type_name, Any, TypeId };
+use std::any::{ type_name, Any };
 use std::collections::hash_map::DefaultHasher;
 
 pub trait Object: 'static {
@@ -19,10 +19,6 @@ pub trait Object: 'static {
 
     fn type_name(&self) -> &'static str {
         type_name::<Self>()
-    }
-
-    fn type_id(&self) -> TypeId {
-        self.as_any().type_id()
     }
 
 }
@@ -129,6 +125,51 @@ mod tests {
         };
         let t: Box<dyn Object> = Box::new(s);
         println!("to_debug_string: {:?}", t);
+    }
+
+    #[test]
+    fn type_name() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let t: Box<dyn Object> = Box::new(s);
+        println!("Box<Object>: {}", t.type_name());
+        println!("Object: {}", t.as_ref().type_name());
+    }
+
+    #[test]
+    fn type_id() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let t: Box<dyn Object> = Box::new(s);
+        println!("Box<Object>: {:?}", t.type_id());
+        println!("Object: {:?}", t.as_ref().type_id());
+    }
+
+    #[test]
+    fn as_any() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let t: Box<dyn Object> = Box::new(s);
+        println!("s: {:?}", t.as_any().downcast_ref::<Box<dyn Object>>().unwrap());
+        println!("s: {:?}", t.as_ref().as_any().downcast_ref::<S1>().unwrap());
+    }
+
+    #[test]
+    fn as_any_mut() {
+        let s = S1 {
+            a: 1,
+            b: 2
+        };
+        let mut t: Box<dyn Object> = Box::new(s);
+        t.as_mut().as_any_mut().downcast_mut::<S1>().unwrap().a = 11;
+        println!("s: {:?}", t.as_any_mut().downcast_mut::<Box<dyn Object>>().unwrap());
+        println!("s: {:?}", t.as_ref().as_any().downcast_ref::<S1>().unwrap());
     }
 
     #[test]
