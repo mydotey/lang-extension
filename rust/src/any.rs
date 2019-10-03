@@ -1,4 +1,4 @@
-use std::any::{ Any, type_name, TypeId };
+use std::any::{ Any, type_name };
 
 pub trait AsAny {
     fn as_any(&self) -> &dyn Any;
@@ -20,22 +20,12 @@ impl<T: 'static> AsAnyMut for T {
     }
 }
 
-pub trait RawTypeName {
-    fn raw_type_name(&self) -> &'static str;
+pub trait AnyExtension {
+    fn type_name(&self) -> &'static str;
 }
 
-impl<T: ?Sized> RawTypeName for T {
-    fn raw_type_name(&self) -> &'static str {
+impl<T: ?Sized> AnyExtension for T {
+    fn type_name(&self) -> &'static str {
         type_name::<Self>()
-    }
-}
-
-pub trait RawTypeId {
-    fn raw_type_id(&self) -> TypeId;
-}
-
-impl<T: 'static + ?Sized> RawTypeId for T {
-    fn raw_type_id(&self) -> TypeId {
-        TypeId::of::<Self>()
     }
 }

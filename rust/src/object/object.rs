@@ -139,8 +139,8 @@ mod tests {
             b: 2
         };
         let t: Box<dyn Object> = Box::new(s);
-        println!("Box<Object>: {}", t.raw_type_name());
-        println!("Object: {}", t.as_ref().raw_type_name());
+        println!("Box<Object>: {}", t.type_name());
+        println!("Object: {}", t.as_ref().type_name());
     }
 
     #[test]
