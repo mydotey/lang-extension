@@ -2,7 +2,7 @@ use std::hash::{ Hash, Hasher };
 use std::fmt::{ Debug, Formatter, Result };
 use std::collections::hash_map::DefaultHasher;
 
-use crate::value::any::*;
+use crate::any::*;
 
 pub trait ObjectConstraits: 'static + Hash + PartialEq + Eq + Debug + Clone { }
 

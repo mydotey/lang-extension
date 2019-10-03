@@ -1,5 +1,7 @@
 
-pub mod value;
+pub mod any;
+pub mod object;
+pub mod option;
 
 #[cfg(test)]
 mod tests {
