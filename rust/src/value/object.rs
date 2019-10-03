@@ -1,13 +1,14 @@
 use std::hash::{ Hash, Hasher };
 use std::fmt::{ Debug, Formatter, Result };
-use std::any::{ type_name, Any, TypeId };
 use std::collections::hash_map::DefaultHasher;
+
+use crate::value::any::*;
 
 pub trait ObjectConstraits: 'static + Hash + PartialEq + Eq + Debug + Clone { }
 
 impl<T: 'static + Hash + PartialEq + Eq + Debug + Clone> ObjectConstraits for T { }
 
-pub trait Object: 'static {
+pub trait Object: 'static + AsAny + AsAnyMut {
 
     fn hashcode(&self) -> u64;
 
@@ -16,18 +17,6 @@ pub trait Object: 'static {
     fn to_debug_string(&self) -> String;
 
     fn clone_boxed(&self) -> Box<dyn Object>;
-
-    fn as_any(&self) -> &dyn Any;
-
-    fn as_any_mut(&mut self) -> &mut dyn Any;
-
-    fn raw_type_name(&self) -> &'static str {
-        type_name::<Self>()
-    }
-
-    fn raw_type_id(&self) -> TypeId {
-        TypeId::of::<Self>()
-    }
 
 }
 
@@ -52,14 +41,6 @@ impl<T: ObjectConstraits> Object for T {
 
     fn clone_boxed(&self) -> Box<dyn Object> {
         Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn Any {
-        self
     }
 
 }
@@ -91,30 +72,18 @@ impl Clone for Box<dyn Object> {
 }
 
 pub fn downcast_raw<T: 'static + Clone>(obj: Box<dyn Object>) -> Option<T> {
-    if obj.as_ref().raw_type_id() == TypeId::of::<T>() {
-        let r =  unsafe { &*(obj.as_ref() as *const dyn Object as *const T) };
-        Some(r.clone())
-    } else {
-        None
+    match obj.as_ref().as_any().downcast_ref::<T>() {
+        Some(r) => Some(r.clone()),
+        None => None
     }
 }
 
 pub fn downcast_ref<T: 'static>(obj: &dyn Object) -> Option<&T> {
-    if obj.raw_type_id() == TypeId::of::<T>() {
-        let r =  unsafe { &*(obj as *const dyn Object as *const T) };
-        Some(r)
-    } else {
-        None
-    }
+    obj.as_any().downcast_ref::<T>()
 }
 
 pub fn downcast_mut<T: 'static>(obj: &mut dyn Object) -> Option<&mut T> {
-    if obj.raw_type_id() == TypeId::of::<T>() {
-        let r =  unsafe { &mut *(obj as *mut dyn Object as *mut T) };
-        Some(r)
-    } else {
-        None
-    }
+    obj.as_any_mut().downcast_mut::<T>()
 }
 
 #[cfg(test)]
@@ -122,6 +91,7 @@ mod tests {
 
     use super::*;
     use std::collections::HashMap;
+    use std::any::*;
 
     #[derive(Hash, PartialEq, Eq, Debug, Clone)]
     struct S1 {

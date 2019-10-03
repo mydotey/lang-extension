@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::any::TypeId;
 
 use super::object::*;
 
@@ -20,11 +19,9 @@ impl ImmutableObject {
     }
 
     pub fn downcast_raw<T: 'static + Clone>(&self) -> Option<T> {
-        if self.value.as_ref().as_ref().raw_type_id() == TypeId::of::<T>() {
-            let r =  unsafe { &*(self.value.as_ref().as_ref() as *const dyn Object as *const T) };
-            Some(r.clone())
-        } else {
-            None
+        match self.value.as_ref().as_ref().as_any().downcast_ref::<T>() {
+            Some(r) => Some(r.clone()),
+            None => None
         }
     }
 }
