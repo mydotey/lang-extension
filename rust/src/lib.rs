@@ -1,6 +1,5 @@
 
 pub mod any;
-#[macro_use]
 pub mod object;
 pub mod option;
 

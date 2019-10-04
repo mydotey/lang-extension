@@ -9,8 +9,12 @@ pub struct ImmutableObject {
 
 impl ImmutableObject {
     pub fn new<T: Object>(value: T) -> ImmutableObject {
+        Self::wrap(Box::new(value))
+    }
+
+    pub fn wrap(value: Box<dyn Object>) -> Self {
         ImmutableObject {
-            value: Arc::new(Box::new(value))
+            value: Arc::new(value)
         }
     }
 

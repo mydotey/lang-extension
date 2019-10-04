@@ -45,38 +45,31 @@ impl<T: ObjectConstraits> Object for T {
 
 }
 
-#[macro_export]
-macro_rules! box_object {
-    ($type: ident) => (
-        impl Hash for Box<dyn $type> {
-            fn hash<H: Hasher>(&self, state: &mut H) {
-                state.write_u64(self.as_ref().hashcode());
-            }
-        }
-
-        impl PartialEq for Box<dyn $type> {
-            fn eq(&self, other: &Self) -> bool {
-                self.as_ref().equals(other.as_ref())
-            }
-        }
-
-        impl Eq for Box<dyn $type> { }
-
-        impl Debug for Box<dyn $type> {
-            fn fmt(&self, f: &mut Formatter) -> Result {
-                write!(f, "{}", self.as_ref().to_debug_string())
-            }
-        }
-
-        impl Clone for Box<dyn $type> {
-            fn clone(&self) -> Self {
-                self.as_ref().clone_boxed()
-            }
-        }
-    )
+impl Hash for Box<dyn Object> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_u64(self.as_ref().hashcode());
+    }
 }
 
-box_object!(Object);
+impl PartialEq for Box<dyn Object> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref().equals(other.as_ref())
+    }
+}
+
+impl Eq for Box<dyn Object> { }
+
+impl Debug for Box<dyn Object> {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{}", self.as_ref().to_debug_string())
+    }
+}
+
+impl Clone for Box<dyn Object> {
+    fn clone(&self) -> Self {
+        self.as_ref().clone_boxed()
+    }
+}
 
 pub fn downcast_raw<T: 'static + Clone>(obj: Box<dyn Object>) -> Option<T> {
     match obj.as_ref().as_any().downcast_ref::<T>() {
