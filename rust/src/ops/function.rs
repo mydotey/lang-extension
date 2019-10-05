@@ -46,3 +46,39 @@ pub type BiFunctionOnce<V, V2, R> = Box<dyn FnOnce(V, V2) -> R>;
 pub type BiConsumerOnce<V, V2> = Box<dyn FnOnce(V, V2)>;
 
 pub type BiPredicateOnce<V, V2> = Box<dyn FnOnce(V, V2) -> bool>;
+
+pub type FunctionRef<V, R> = Box<dyn Fn(&V) -> R>;
+
+pub type ConsumerRef<V> = Box<dyn Fn(&V)>;
+
+pub type PredicateRef<V> = Box<dyn Fn(&V) -> bool>;
+
+pub type BiFunctionRef<V, V2, R> = Box<dyn Fn(&V, &V2) -> R>;
+
+pub type BiConsumerRef<V, V2> = Box<dyn Fn(&V, &V2)>;
+
+pub type BiPredicateRef<V, V2> = Box<dyn Fn(&V, &V2) -> bool>;
+
+pub type FunctionRefMut<V, R> = Box<dyn FnMut(&V) -> R>;
+
+pub type ConsumerRefMut<V> = Box<dyn FnMut(&V)>;
+
+pub type PredicateRefMut<V> = Box<dyn FnMut(&V) -> bool>;
+
+pub type BiFunctionRefMut<V, V2, R> = Box<dyn FnMut(&V, &V2) -> R>;
+
+pub type BiConsumerRefMut<V, V2> = Box<dyn FnMut(&V, &V2)>;
+
+pub type BiPredicateRefMut<V, V2> = Box<dyn FnMut(&V, &V2) -> bool>;
+
+pub type FunctionRefOnce<V, R> = Box<dyn FnOnce(&V) -> R>;
+
+pub type ConsumerRefOnce<V> = Box<dyn FnOnce(&V)>;
+
+pub type PredicateRefOnce<V> = Box<dyn FnOnce(&V) -> bool>;
+
+pub type BiFunctionRefOnce<V, V2, R> = Box<dyn FnOnce(&V, &V2) -> R>;
+
+pub type BiConsumerRefOnce<V, V2> = Box<dyn FnOnce(&V, &V2)>;
+
+pub type BiPredicateRefOnce<V, V2> = Box<dyn FnOnce(&V, &V2) -> bool>;
