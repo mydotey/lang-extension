@@ -1,6 +1,6 @@
 use std::hash::{ Hash, Hasher };
 use std::fmt::{ Debug, Formatter, Result };
-use std::collections::hash_map::DefaultHasher;
+use std::any::Any;
 
 use crate::any::*;
 
@@ -8,11 +8,9 @@ pub trait ObjectConstraits: 'static + Hash + PartialEq + Eq + Debug + Clone { }
 
 impl<T: 'static + Hash + PartialEq + Eq + Debug + Clone> ObjectConstraits for T { }
 
-pub trait Object: 'static + AsAny + AsAnyMut {
+pub trait Object: 'static + AnyExtension + AsAny + AsAnyMut {
 
-    fn hashcode(&self) -> u64;
-
-    fn equals(&self, other: &dyn Object) -> bool;
+    fn equals(&self, other: &dyn Any) -> bool;
 
     fn to_debug_string(&self) -> String;
 
@@ -22,19 +20,13 @@ pub trait Object: 'static + AsAny + AsAnyMut {
 
 impl<T: ObjectConstraits> Object for T {
 
-    fn hashcode(&self) -> u64 {
-        let mut hasher = DefaultHasher::default();
-        T::hash(self, &mut hasher);
-        hasher.finish()
-    }
-
-    fn equals(&self, other: &dyn Object) -> bool {
-        match other.as_any().downcast_ref::<T>() {
+    fn equals(&self, other: &dyn Any) -> bool {
+        match other.downcast_ref::<T>() {
             Some(r) => *self == *r,
             None => false
         }
     }
-
+ 
     fn to_debug_string(&self) -> String {
         format!("{:?}", self)
     }
@@ -53,7 +45,7 @@ impl Hash for Box<dyn Object> {
 
 impl PartialEq for Box<dyn Object> {
     fn eq(&self, other: &Self) -> bool {
-        self.as_ref().equals(other.as_ref())
+        self.as_ref().equals(other.as_ref().as_any())
     }
 }
 
@@ -91,7 +83,6 @@ mod tests {
 
     use super::*;
     use std::collections::HashMap;
-    use std::any::*;
 
     #[derive(Hash, PartialEq, Eq, Debug, Clone)]
     struct S1 {
