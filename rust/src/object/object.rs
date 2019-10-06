@@ -1,4 +1,5 @@
 use std::hash::{ Hash, Hasher };
+use std::collections::hash_map::DefaultHasher;
 use std::fmt::{ Debug, Formatter, Result };
 use std::any::Any;
 
@@ -10,6 +11,8 @@ impl<T: 'static + Hash + PartialEq + Eq + Debug + Clone> ObjectConstraits for T 
 
 pub trait Object: 'static + AnyExtension + AsAny + AsAnyMut {
 
+    fn hashcode(&self) -> u64;
+
     fn equals(&self, other: &dyn Any) -> bool;
 
     fn to_debug_string(&self) -> String;
@@ -19,6 +22,11 @@ pub trait Object: 'static + AnyExtension + AsAny + AsAnyMut {
 }
 
 impl<T: ObjectConstraits> Object for T {
+    fn hashcode(&self) -> u64 {
+        let mut hasher = DefaultHasher::default();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
 
     fn equals(&self, other: &dyn Any) -> bool {
         match other.downcast_ref::<T>() {

@@ -1,6 +1,4 @@
 use std::any::{ Any, type_name };
-use std::hash::Hasher;
-use std::collections::hash_map::DefaultHasher;
 use std::string::*;
 
 pub trait AsAny {
@@ -25,8 +23,8 @@ impl<T: 'static> AsAnyMut for T {
 
 pub trait AnyExtension {
     fn type_name(&self) -> &'static str;
-    fn address(&self) -> isize;
-    fn hashcode(&self) -> u64;
+    fn address(&self) -> usize;
+    fn string(&self) -> String;
     fn reference_equals(&self, other: &dyn Any) -> bool;
 }
 
@@ -35,25 +33,17 @@ impl<T: ?Sized> AnyExtension for T {
         type_name::<Self>()
     }
 
-    fn address(&self) -> isize {
-        let s: String = format!("{:?}", self as *const T);
-        match s.parse::<isize>() {
-            Ok(v) => v,
-            Err(_) => -1
-        }
+    fn address(&self) -> usize {
+        self as *const T as *const () as usize
     }
 
-    fn hashcode(&self) -> u64 {
-        let mut hasher = DefaultHasher::default();
-        hasher.write_isize(self.address());
-        hasher.finish()
+    fn string(&self) -> String {
+        format!("{{ type: {}, address: {} }}", self.type_name(), self.address())
     }
 
     fn reference_equals(&self, other: &dyn Any) -> bool {
-        let (p, p2) = (self.address(), other.address());
-        p != -1 && p == p2
+        self.address() == other.address()
     }
-
 }
 
 #[cfg(test)]
@@ -63,14 +53,13 @@ mod tests {
     #[test]
     fn any_extension() {
         let a: Box<dyn AnyExtension> = Box::new(10);
-        println!("type_name: {}, hash_code: {}, address: {:?}",
-            a.as_ref().type_name(), a.as_ref().hashcode(), a.as_ref() as *const _);
-        println!("type_name: {}, hash_code: {}, address: {:?}",
-            a.type_name(), a.hashcode(), &a as *const _);
+        println!("string: {}, type_name: {}, address: {:?}",
+            a.string(), a.as_ref().type_name(), a.as_ref().address());
 
         let b: Box<dyn AnyExtension> = Box::new(10);
-        println!("type_name: {}, hash_code: {}, address: {:?}",
-            b.as_ref().type_name(), b.as_ref().hashcode(), b.as_ref() as *const _);
+        println!("string: {}, type_name: {}, address: {:?}",
+            b.string(), b.as_ref().type_name(), b.as_ref().address());
+
         println!("a == b: {}", a.as_ref().reference_equals(b.as_any()));
         assert!(!a.as_ref().reference_equals(b.as_any()));
     }
