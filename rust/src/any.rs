@@ -23,8 +23,8 @@ impl<T: 'static> AsAnyMut for T {
 
 pub trait AnyExtension {
     fn type_name(&self) -> &'static str;
-    fn address(&self) -> usize;
-    fn string(&self) -> String;
+    fn memory_address(&self) -> usize;
+    fn to_instance_string(&self) -> String;
     fn reference_equals(&self, other: &dyn Any) -> bool;
 }
 
@@ -33,16 +33,16 @@ impl<T: ?Sized> AnyExtension for T {
         type_name::<Self>()
     }
 
-    fn address(&self) -> usize {
+    fn memory_address(&self) -> usize {
         self as *const T as *const () as usize
     }
 
-    fn string(&self) -> String {
-        format!("{{ type: {}, address: {} }}", self.type_name(), self.address())
+    fn to_instance_string(&self) -> String {
+        format!("{{ type_name: {}, memory_address: {} }}", self.type_name(), self.memory_address())
     }
 
     fn reference_equals(&self, other: &dyn Any) -> bool {
-        self.address() == other.address()
+        self.memory_address() == other.memory_address()
     }
 }
 
@@ -52,13 +52,13 @@ mod tests {
 
     #[test]
     fn any_extension() {
-        let a: Box<dyn AnyExtension> = Box::new(10);
-        println!("string: {}, type_name: {}, address: {:?}",
-            a.string(), a.as_ref().type_name(), a.as_ref().address());
+        let a: Box<dyn Any> = Box::new(10);
+        println!("instance_string: {}, type_name: {}, memory_address: {:?}",
+            a.as_ref().to_instance_string(), a.as_ref().type_name(), a.as_ref().memory_address());
 
-        let b: Box<dyn AnyExtension> = Box::new(10);
-        println!("string: {}, type_name: {}, address: {:?}",
-            b.string(), b.as_ref().type_name(), b.as_ref().address());
+        let b: Box<dyn Any> = Box::new(10);
+        println!("instance_string: {}, type_name: {}, memory_address: {:?}",
+            a.as_ref().to_instance_string(), b.as_ref().type_name(), b.as_ref().memory_address());
 
         println!("a == b: {}", a.as_ref().reference_equals(b.as_any()));
         assert!(!a.as_ref().reference_equals(b.as_any()));
