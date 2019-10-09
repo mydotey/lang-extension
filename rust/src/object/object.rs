@@ -19,6 +19,8 @@ pub trait Object: 'static + AnyExtension + AsAny + AsAnyMut {
 
     fn clone_boxed(&self) -> Box<dyn Object>;
 
+    fn as_object(&self) -> &dyn Object;
+
 }
 
 impl<T: ObjectConstraits> Object for T {
@@ -41,6 +43,10 @@ impl<T: ObjectConstraits> Object for T {
 
     fn clone_boxed(&self) -> Box<dyn Object> {
         Box::new(self.clone())
+    }
+
+    fn as_object(&self) -> &dyn Object {
+        self
     }
 
 }
