@@ -1,6 +1,6 @@
 use std::hash::{ Hash, Hasher };
 use std::collections::hash_map::DefaultHasher;
-use std::fmt::{ Debug, Formatter, Result };
+use std::fmt::Debug;
 use std::any::Any;
 
 use crate::any::*;
@@ -51,31 +51,39 @@ impl<T: ObjectConstraits> Object for T {
 
 }
 
-impl Hash for Box<dyn Object> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
+#[allow(unused_macros)]
+#[macro_export]
+macro_rules! boxed_trait_object {
+    ($type: tt) => {
+impl std::hash::Hash for Box<dyn $type> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         state.write_u64(self.as_ref().hashcode());
     }
 }
 
-impl PartialEq for Box<dyn Object> {
+impl PartialEq for Box<dyn $type> {
     fn eq(&self, other: &Self) -> bool {
         self.as_ref().equals(other.as_ref().as_any())
     }
 }
 
-impl Eq for Box<dyn Object> { }
+impl Eq for Box<dyn $type> { }
 
-impl Debug for Box<dyn Object> {
-    fn fmt(&self, f: &mut Formatter) -> Result {
+impl std::fmt::Debug for Box<dyn $type> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.as_ref().to_debug_string())
     }
 }
 
-impl Clone for Box<dyn Object> {
+impl Clone for Box<dyn $type> {
     fn clone(&self) -> Self {
-        self.as_ref().clone_boxed()
+        $type::clone_boxed(self.as_ref())
     }
 }
+    };
+}
+
+boxed_trait_object!(Object);
 
 pub fn downcast_raw<T: 'static + Clone>(obj: Box<dyn Object>) -> Option<T> {
     match obj.as_ref().as_any().downcast_ref::<T>() {

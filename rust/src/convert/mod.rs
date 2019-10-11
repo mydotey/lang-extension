@@ -1,5 +1,6 @@
 use std::any::TypeId;
 use crate::object::*;
+use crate::*;
 
 pub mod default;
 
@@ -10,6 +11,8 @@ pub trait RawTypeConverter: Object + Sync + Send {
     fn get_target_type(&self) -> TypeId;
 
     fn convert(&self, source: &dyn Object) -> Result<Box<dyn Object>, Box<dyn Object>>;
+
+    fn clone_boxed(&self) -> Box<dyn RawTypeConverter>;
 
 }
 
@@ -48,15 +51,19 @@ impl RawTypeConverter for $type {
         }
     }
 
+    fn clone_boxed(&self) -> Box<dyn RawTypeConverter> {
+        Box::new(self.clone())
+    }
+
 }
 
 unsafe impl Sync for $type { }
 unsafe impl Send for $type { }
 
     };
-    ($type: tt; $source_type: tt; $target_type: tt) => {
+    ($generic_type: tt; $source_type: tt; $target_type: tt) => {
 impl<$source_type: ObjectConstraits, $target_type: ObjectConstraits>
-    RawTypeConverter for $type<$source_type, $target_type> {
+    RawTypeConverter for $generic_type<$source_type, $target_type> {
 
     fn get_source_type(&self) -> TypeId {
         TypeId::of::<$source_type>()
@@ -76,19 +83,25 @@ impl<$source_type: ObjectConstraits, $target_type: ObjectConstraits>
             },
             None => Err(Box::new(format!("source object {} is of an unsupported type: {:?}, only support: {:?}",
                 source.to_debug_string(), source.type_name(),
-                std::any::type_name::<$type::<$source_type, $target_type>>())))
+                std::any::type_name::<$generic_type::<$source_type, $target_type>>())))
         }
+    }
+
+    fn clone_boxed(&self) -> Box<dyn RawTypeConverter> {
+        Box::new(self.clone())
     }
 
 }
 
 unsafe impl<$source_type: ObjectConstraits, $target_type: ObjectConstraits> Sync
-    for $type<$source_type, $target_type> { }
+    for $generic_type<$source_type, $target_type> { }
 unsafe impl<$source_type: ObjectConstraits, $target_type: ObjectConstraits>
-    Send for $type<$source_type, $target_type> { }
+    Send for $generic_type<$source_type, $target_type> { }
 
     };
 }
+
+boxed_trait_object!(RawTypeConverter);
 
 #[cfg(test)]
 mod tests {
