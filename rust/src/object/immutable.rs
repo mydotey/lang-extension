@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::object::*;
+use super::*;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone)]
 pub struct ImmutableObject {
