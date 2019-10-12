@@ -83,7 +83,7 @@ impl<$source_type: ObjectConstraits, $target_type: ObjectConstraits>
             },
             None => Err(Box::new(format!("source object {} is of an unsupported type: {:?}, only support: {:?}",
                 source.to_debug_string(), source.type_name(),
-                std::any::type_name::<$generic_type::<$source_type, $target_type>>())))
+                std::any::type_name::<$source_type>())))
         }
     }
 
