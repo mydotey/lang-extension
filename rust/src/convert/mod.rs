@@ -36,7 +36,7 @@ macro_rules! raw_type_converter {
     fn convert(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>> {
         match source.as_any_ref().downcast_ref::<$source_type>() {
             Some(s) => {
-                match TypeConverter::convert(self, s) {
+                match crate::convert::TypeConverter::convert(self, s) {
                     Ok(t) => Ok(Value::to_boxed(*t)),
                     Err(err) => Err(err)
                 }
@@ -51,7 +51,7 @@ as_boxed!(impl RawTypeConverter);
     };
 
     ($type: ty, $source_type: ty, $target_type: ty) => {
-impl RawTypeConverter for $type {
+impl crate::convert::RawTypeConverter for $type {
 raw_type_converter!(inner $type, $source_type, $target_type);
 }
 
@@ -62,7 +62,7 @@ unsafe impl Send for $type { }
 
     ($generic_type: tt; $source_type: tt; $target_type: tt) => {
 impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + ValueConstraint>
-    RawTypeConverter for $generic_type<$source_type, $target_type> {
+    crate::convert::RawTypeConverter for $generic_type<$source_type, $target_type> {
 raw_type_converter!(inner $generic_type, $source_type, $target_type);
 }
 
