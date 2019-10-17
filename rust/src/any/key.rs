@@ -1,7 +1,6 @@
 use std::hash::{ Hash, Hasher };
 use std::collections::hash_map::DefaultHasher;
 
-use crate::*;
 use super::*;
 
 pub trait KeyConstraint: ValueConstraint + Hash { }

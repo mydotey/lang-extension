@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 use std::any::Any;
 
-use crate::*;
 use super::*;
 
 pub trait ValueConstraint: 'static + PartialEq + Eq + Debug + Clone { }

@@ -1,5 +1,4 @@
 
-#[macro_use]
 pub mod any;
 
 pub mod fmt;

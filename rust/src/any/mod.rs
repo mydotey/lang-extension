@@ -1,14 +1,14 @@
 use std::any::{ Any, type_name };
 
-mod as_boxed;
-pub use as_boxed::*;
+#[macro_use]
+mod as_macro;
+pub use as_macro::*;
 
-mod as_trait;
-pub use as_trait::*;
-
+#[macro_use]
 mod value;
 pub use value::*;
 
+#[macro_use]
 mod key;
 pub use key::*;
 

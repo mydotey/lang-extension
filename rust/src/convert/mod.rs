@@ -1,6 +1,6 @@
 use std::any::TypeId;
 use crate::any::*;
-use crate::*;
+use crate::{ as_trait, as_boxed, boxed_value_trait };
 
 pub mod default;
 
