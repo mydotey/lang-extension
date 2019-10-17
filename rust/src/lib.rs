@@ -1,10 +1,8 @@
 
+#[macro_use]
 pub mod any;
 
-#[macro_use]
-pub mod object;
-
-pub mod option;
+pub mod fmt;
 pub mod ops;
 
 #[macro_use]
