@@ -8,13 +8,17 @@ use crate::ops::function::*;
 
 #[derive(Clone)]
 pub struct DefaultTypeConverter<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> {
-    convert: Arc::<FunctionRef<S, Result<Box<T>, Box<dyn Value>>>>
+    convert: FunctionRef<S, Result<Box<T>, Box<dyn Value>>>
 }
 
 impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> DefaultTypeConverter<S, T> {
-    pub fn new(convert: FunctionRef<S, Result<Box<T>, Box<dyn Value>>>) -> Self {
+    pub fn new(convert: Box<dyn Fn(&S) -> Result<Box<T>, Box<dyn Value>>>) -> Self {
+        Self::wrap(Arc::new(convert))
+    }
+
+    pub fn wrap(convert: FunctionRef<S, Result<Box<T>, Box<dyn Value>>>) -> Self {
         Self {
-            convert: Arc::new(convert)
+            convert: convert
         }
     }
 }
