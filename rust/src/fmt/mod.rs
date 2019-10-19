@@ -2,11 +2,11 @@ use std::fmt::{ Display, Debug };
 
 use super::any::*;
 
-pub trait ToStringExtension<T: Display> {
+pub trait ToStringExtension {
     fn to_string(&self) -> String;
 }
 
-pub trait ToDebugString<T: Debug> {
+pub trait ToDebugString {
     fn to_debug_string(&self) -> String;
 }
 
@@ -20,19 +20,16 @@ impl<T: ?Sized> ToInstanceString for T {
     }
 }
 
-impl<T: Display> ToStringExtension<T> for Option<T> {
-    fn to_string(&self) -> String {
-        match self {
-            Some(value) => format!("Some({})", value.to_string()),
-            None => "None".to_string()
-        }
+impl<T: ?Sized + Debug> ToDebugString for T {
+    fn to_debug_string(&self) -> String {
+        format!("{:?}", self)
     }
 }
 
-impl<T: Debug> ToDebugString<T> for Option<T> {
-    fn to_debug_string(&self) -> String {
+impl<T: Display> ToStringExtension for Option<T> {
+    fn to_string(&self) -> String {
         match self {
-            Some(value) => format!("Some({:?})", value),
+            Some(value) => format!("Some({})", value.to_string()),
             None => "None".to_string()
         }
     }
@@ -54,6 +51,7 @@ mod tests {
     fn to_debug_string() {
         let mut o = Some(10);
         println!("{}", o.to_debug_string());
+        println!("{:?}", o);
         o = None;
         println!("{}", o.to_debug_string());
     }
