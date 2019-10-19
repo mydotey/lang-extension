@@ -34,7 +34,7 @@ unsafe impl Sync for ImmutableValue {
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone)]
 pub struct ImmutableKey {
-    value: Arc<Box<dyn Key>>
+    key: Arc<Box<dyn Key>>
 }
 
 impl ImmutableKey {
@@ -44,12 +44,12 @@ impl ImmutableKey {
 
     pub fn wrap(value: Box<dyn Key>) -> Self {
         ImmutableKey {
-            value: Arc::new(value)
+            key: Arc::new(value)
         }
     }
 
     pub fn raw_boxed(&self) -> Box<dyn Key> {
-        self.value.as_ref().clone()
+        self.key.as_ref().clone()
     }
 
 }
