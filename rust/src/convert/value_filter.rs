@@ -6,7 +6,7 @@ use crate::any::*;
 use crate::ops::function::*;
 
 pub trait RawValueFilter: Value + Sync + Send {
-    fn filter(&self, value: Box<dyn Value>) -> Option<Box<dyn Value>>;
+    fn filter_raw(&self, value: Box<dyn Value>) -> Option<Box<dyn Value>>;
 
 as_trait!(RawValueFilter);
 as_boxed!(RawValueFilter);
@@ -60,7 +60,7 @@ unsafe impl<V: ?Sized + ValueConstraint> Sync for DefaultValueFilter<V> { }
 unsafe impl<V: ?Sized + ValueConstraint> Send for DefaultValueFilter<V> { }
 
 impl<V: ?Sized + ValueConstraint> RawValueFilter for DefaultValueFilter<V> {
-    fn filter(&self, value: Box<dyn Value>) -> Option<Box<dyn Value>> {
+    fn filter_raw(&self, value: Box<dyn Value>) -> Option<Box<dyn Value>> {
         match value.as_ref().as_any_ref().downcast_ref::<V>() {
             Some(value) => self.filter.as_ref()(Box::new(value.clone())).map(|v|Value::clone_boxed(v.as_ref())),
             None => None
@@ -80,11 +80,11 @@ mod tests {
         let filter = DefaultValueFilter::<i32>::new(Box::new(|v|{
             if *v > 10 { Some(v) } else { None }
         }));
-        let v = ValueFilter::<i32>::filter(&filter, Box::new(10));
+        let v = filter.filter(Box::new(10));
         assert_eq!(None, v);
-        let v = ValueFilter::<i32>::filter(&filter, Box::new(11));
+        let v = filter.filter(Box::new(11));
         assert_eq!(Box::new(11), v.unwrap());
-        let v = RawValueFilter::filter(&filter, Box::new(11));
+        let v = RawValueFilter::filter_raw(&filter, Box::new(11));
         let expected: Box<dyn Value> = Box::new(11);
         assert_eq!(&expected, &v.unwrap());
     }

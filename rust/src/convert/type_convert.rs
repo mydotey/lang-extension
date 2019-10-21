@@ -12,7 +12,7 @@ pub trait RawTypeConverter: Value + Sync + Send {
 
     fn get_target_type(&self) -> TypeId;
 
-    fn convert(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>>;
+    fn convert_raw(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>>;
 
 as_trait!(RawTypeConverter);
 as_boxed!(RawTypeConverter);
@@ -35,7 +35,7 @@ macro_rules! raw_type_converter {
         TypeId::of::<$target_type>()
     }
 
-    fn convert(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>> {
+    fn convert_raw(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>> {
         match source.as_any_ref().downcast_ref::<$source_type>() {
             Some(s) => {
                 match crate::convert::TypeConverter::convert(self, s) {
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn type_convert() {
-        match TypeConverter::convert(&C, &9) {
+        match C.convert(&9) {
             Ok(s) => {
                 println!("{}", s);
                 assert_eq!("9".to_string(), *s);
@@ -151,7 +151,7 @@ mod tests {
             }
         }
 
-        match RawTypeConverter::convert(RawTypeConverter::as_trait_ref(&C{}), Value::as_trait_ref(&9)) {
+        match C.convert_raw(Value::as_trait_ref(&9)) {
             Ok(s) => {
                 println!("{:?}", s);
                 assert_eq!("9".to_string(), *s.as_ref().as_any_ref().downcast_ref::<String>().unwrap());
@@ -162,7 +162,7 @@ mod tests {
             }
         }
 
-        match RawTypeConverter::convert(RawTypeConverter::as_trait_ref(&C{}), Value::as_trait_ref(&"ok")) {
+        match C.convert_raw(Value::as_trait_ref(&"ok")) {
             Ok(s) => {
                 println!("{:?}", s);
                 assert!(false);
