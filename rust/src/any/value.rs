@@ -30,20 +30,10 @@ as_boxed!(impl Value);
 
 #[macro_export]
 macro_rules! boxed_value_trait {
-    ($type: tt) => {
-impl PartialEq for Box<dyn $type> {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_ref().equals(other.as_ref().as_any_ref())
-    }
-}
-
-impl Eq for Box<dyn $type> { }
-
-impl Clone for Box<dyn $type> {
-    fn clone(&self) -> Self {
-        $type::clone_boxed(self.as_ref())
-    }
-}
+    ($trait: tt) => {
+as_boxed!(impl PartialEq for $trait);
+as_boxed!(impl Eq for $trait);
+as_boxed!(impl Clone for $trait);
     };
 }
 

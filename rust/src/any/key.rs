@@ -29,14 +29,9 @@ as_boxed!(impl Key);
 
 #[macro_export]
 macro_rules! boxed_key_trait {
-    ($type: tt) => {
-impl std::hash::Hash for Box<dyn $type> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        state.write_u64(self.as_ref().hashcode());
-    }
-}
-
-boxed_value_trait!($type);
+    ($trait: tt) => {
+as_boxed!(impl Hash for $trait);
+boxed_value_trait!($trait);
     };
 }
 
