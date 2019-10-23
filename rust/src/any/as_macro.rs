@@ -49,7 +49,15 @@ impl<$($param), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
 }
     };
 
-    (impl PartialEq for $trait:tt) => {
+    (impl Hash for $trait:tt<$($param:tt: $constraint:tt), *>) => {
+impl<$($param: $constraint), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u64(self.as_ref().hashcode());
+    }
+}
+    };
+
+     (impl PartialEq for $trait:tt) => {
 impl PartialEq for Box<dyn $trait> {
     fn eq(&self, other: &Self) -> bool {
         self.as_ref().equals(other.as_ref().as_any_ref())
@@ -65,12 +73,24 @@ impl<$($param), *> PartialEq for Box<dyn $trait<$($param), *>> {
 }
     };
 
+    (impl PartialEq for $trait:tt<$($param:tt: $constraint:tt), *>) => {
+impl<$($param: $constraint), *> PartialEq for Box<dyn $trait<$($param), *>> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref().equals(other.as_ref().as_any_ref())
+    }
+}
+    };
+
     (impl Eq for $trait:tt) => {
 impl Eq for Box<dyn $trait> { }
     };
 
     (impl Eq for $trait:tt<$($param:tt), *>) => {
 impl<$($param), *> Eq for Box<dyn $trait<$($param), *>> { }
+    };
+
+    (impl Eq for $trait:tt<$($param:tt: $constraint:tt), *>) => {
+impl<$($param: $constraint), *> Eq for Box<dyn $trait<$($param), *>> { }
     };
 
     (impl Clone for $trait:tt) => {
@@ -83,6 +103,14 @@ impl Clone for Box<dyn $trait> {
 
     (impl Clone for $trait:tt<$($param:tt), *>) => {
 impl<$($param), *> Clone for Box<dyn $trait<$($param), *>> {
+    fn clone(&self) -> Self {
+        $trait::clone_boxed(self.as_ref())
+    }
+}
+    };
+
+    (impl Clone for $trait:tt<$($param:tt: $constraint:tt), *>) => {
+impl<$($param: $constraint), *> Clone for Box<dyn $trait<$($param), *>> {
     fn clone(&self) -> Self {
         $trait::clone_boxed(self.as_ref())
     }
@@ -207,4 +235,32 @@ mod tests {
     as_boxed!(impl SomeType2<K, V>);
     as_trait!(impl SomeType2<K, V>);
     }
+
+    trait SomeType3<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType3<K, V>);
+    as_trait!(SomeType3<K, V>);
+    }
+
+    as_boxed!(impl Hash for SomeType3<K: KeyConstraint, V: ValueConstraint>);
+    as_boxed!(impl PartialEq for SomeType3<K: KeyConstraint, V: ValueConstraint>);
+    as_boxed!(impl Eq for SomeType3<K: KeyConstraint, V: ValueConstraint>);
+    as_boxed!(impl Clone for SomeType3<K: KeyConstraint, V: ValueConstraint>);
+
+    #[derive(Clone, PartialEq, Eq, Hash, Debug)]
+    struct ST3<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint> { 
+        k: PhantomData<K>,
+        v: PhantomData<V>
+    }
+
+    impl<K: ?Sized + KeyConstraint, V: ?Sized + KeyConstraint> SomeType3<K, V> for ST3<K, V> {
+        fn say(&self, _k: K, _v: V) {
+
+        }
+
+    as_boxed!(impl SomeType3<K, V>);
+    as_trait!(impl SomeType3<K, V>);
+    }
+
 }

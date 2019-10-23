@@ -38,6 +38,11 @@ boxed_value_trait!($trait);
 as_boxed!(impl Hash for $trait<$($param), *>);
 boxed_value_trait!($trait<$($param), *>);
     };
+
+    ($trait:tt<$($param:tt: $constraint:tt), *>) => {
+as_boxed!(impl Hash for $trait<$($param: $constraint), *>);
+boxed_value_trait!($trait<$($param: $constraint), *>);
+    };
 }
 
 boxed_key_trait!(Key);
@@ -45,14 +50,27 @@ boxed_key_trait!(Key);
 #[cfg(test)]
 mod tests {
 
+    use crate::*;
     use super::*;
     use std::collections::HashMap;
+
+    trait K1<K: KeyConstraint>: Key {
+        fn say(&self, _k: K) { }
+
+    as_boxed!(K1<K>);
+    }
 
     #[derive(Hash, PartialEq, Eq, Debug, Clone)]
     struct S1 {
         a: i32,
         b: u32
     }
+
+    impl<K: KeyConstraint> K1<K> for S1 {
+    as_boxed!(impl K1<K>);
+    }
+
+    boxed_key_trait!(K1<K: KeyConstraint>);
 
     #[test]
     fn hashcode() {

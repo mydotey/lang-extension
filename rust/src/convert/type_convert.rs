@@ -18,11 +18,16 @@ as_trait!(RawTypeConverter);
 as_boxed!(RawTypeConverter);
 }
 
-pub trait TypeConverter<S: ?Sized + Value, T: ?Sized + Value> : RawTypeConverter {
+boxed_value_trait!(RawTypeConverter);
+
+pub trait TypeConverter<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> : RawTypeConverter {
 
     fn convert(&self, source: &S) -> Result<Box<T>, Box<dyn Value>>;
 
+as_boxed!(TypeConverter<S, T>);
 }
+
+boxed_value_trait!(TypeConverter<S: ValueConstraint, T: ValueConstraint>);
 
 #[macro_export]
 macro_rules! raw_type_converter {
@@ -76,8 +81,6 @@ unsafe impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + Value
     };
 }
 
-boxed_value_trait!(RawTypeConverter);
-
 #[derive(Clone)]
 pub struct DefaultTypeConverter<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> {
     convert: FunctionRef<S, Result<Box<T>, Box<dyn Value>>>
@@ -102,6 +105,7 @@ impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> TypeConverter<S, 
         self.convert.as_ref()(source)
     }
 
+as_boxed!(impl TypeConverter<S, T>);
 }
 
 impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> PartialEq for DefaultTypeConverter<S, T> {
@@ -134,6 +138,7 @@ mod tests {
             Ok(Box::new(source.to_string()))
         }
 
+    as_boxed!(impl TypeConverter<i32, String>);
     }
 
     raw_type_converter!(C, i32, String);

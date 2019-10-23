@@ -16,7 +16,11 @@ boxed_value_trait!(RawValueFilter);
 
 pub trait ValueFilter<V: ?Sized + ValueConstraint>: RawValueFilter {
     fn filter(&self, value: Box<V>) -> Option<Box<V>>;
+
+as_boxed!(ValueFilter<V>);
 }
+
+boxed_value_trait!(ValueFilter<V: ValueConstraint>);
 
 #[derive(Clone)]
 pub struct DefaultValueFilter<V: ?Sized + ValueConstraint> {
@@ -40,6 +44,8 @@ impl<V: ?Sized + ValueConstraint> ValueFilter<V>
     fn filter(&self, value: Box<V>) -> Option<Box<V>> {
         self.filter.as_ref()(value)
     }
+
+as_boxed!(impl ValueFilter<V>);
 }
 
 impl<V: ?Sized + ValueConstraint> PartialEq for DefaultValueFilter<V> {

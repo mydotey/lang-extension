@@ -41,6 +41,12 @@ as_boxed!(impl PartialEq for $trait<$($param), *>);
 as_boxed!(impl Eq for $trait<$($param), *>);
 as_boxed!(impl Clone for $trait<$($param), *>);
     };
+
+    ($trait:tt<$($param:tt: $constraint:tt), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param: $constraint), *>);
+as_boxed!(impl Eq for $trait<$($param: $constraint), *>);
+as_boxed!(impl Clone for $trait<$($param: $constraint), *>);
+    };
 }
 
 boxed_value_trait!(Value);
