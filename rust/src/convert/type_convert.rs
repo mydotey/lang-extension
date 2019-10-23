@@ -26,7 +26,7 @@ pub trait TypeConverter<S: ?Sized + Value, T: ?Sized + Value> : RawTypeConverter
 
 #[macro_export]
 macro_rules! raw_type_converter {
-    (inner $type: ty, $source_type: ty, $target_type: ty) => {
+    ($source_type: ty, $target_type: ty) => {
     fn get_source_type(&self) -> TypeId {
         TypeId::of::<$source_type>()
     }
@@ -54,7 +54,7 @@ as_boxed!(impl RawTypeConverter);
 
     ($type: ty, $source_type: ty, $target_type: ty) => {
 impl crate::convert::RawTypeConverter for $type {
-raw_type_converter!(inner $type, $source_type, $target_type);
+raw_type_converter!($source_type, $target_type);
 }
 
 unsafe impl Sync for $type { }
@@ -62,16 +62,16 @@ unsafe impl Send for $type { }
 
     };
 
-    ($generic_type: tt; $source_type: tt; $target_type: tt) => {
+    ($type: tt<$source_type:tt, $target_type:tt>) => {
 impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + ValueConstraint>
-    crate::convert::RawTypeConverter for $generic_type<$source_type, $target_type> {
-raw_type_converter!(inner $generic_type, $source_type, $target_type);
+    crate::convert::RawTypeConverter for $type<$source_type, $target_type> {
+raw_type_converter!($source_type, $target_type);
 }
 
 unsafe impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + ValueConstraint> Sync
-    for $generic_type<$source_type, $target_type> { }
+    for $type<$source_type, $target_type> { }
 unsafe impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + ValueConstraint>
-    Send for $generic_type<$source_type, $target_type> { }
+    Send for $type<$source_type, $target_type> { }
 
     };
 }
@@ -119,7 +119,7 @@ impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> fmt::Debug for De
     }
 }
 
-raw_type_converter!(DefaultTypeConverter; S; T);
+raw_type_converter!(DefaultTypeConverter<S, T>);
 
 #[cfg(test)]
 mod tests {

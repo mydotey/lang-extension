@@ -29,9 +29,14 @@ as_boxed!(impl Key);
 
 #[macro_export]
 macro_rules! boxed_key_trait {
-    ($trait: tt) => {
+    ($trait:tt) => {
 as_boxed!(impl Hash for $trait);
 boxed_value_trait!($trait);
+    };
+
+    ($trait:tt<$($param:tt), *>) => {
+as_boxed!(impl Hash for $trait<$($param), *>);
+boxed_value_trait!($trait<$($param), *>);
     };
 }
 

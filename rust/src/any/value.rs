@@ -30,10 +30,16 @@ as_boxed!(impl Value);
 
 #[macro_export]
 macro_rules! boxed_value_trait {
-    ($trait: tt) => {
+    ($trait:tt) => {
 as_boxed!(impl PartialEq for $trait);
 as_boxed!(impl Eq for $trait);
 as_boxed!(impl Clone for $trait);
+    };
+
+    ($trait:tt<$($param:tt), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param), *>);
+as_boxed!(impl Eq for $trait<$($param), *>);
+as_boxed!(impl Clone for $trait<$($param), *>);
     };
 }
 
