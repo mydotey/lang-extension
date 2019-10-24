@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::fmt;
+use std::any::type_name;
 
 use crate::*;
 use crate::any::*;
@@ -58,7 +59,7 @@ impl<V: ?Sized + ValueConstraint> Eq for DefaultValueFilter<V> { }
 
 impl<V: ?Sized + ValueConstraint> fmt::Debug for DefaultValueFilter<V> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{ filter: {} }}", self.filter.type_name())
+        write!(f, "{} {{ filter: {} }}", type_name::<DefaultValueFilter<V>>(), self.filter.type_name())
     }
 }
 
