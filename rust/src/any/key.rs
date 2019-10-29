@@ -39,9 +39,24 @@ as_boxed!(impl Hash for $trait<$($param), *>);
 boxed_value_trait!($trait<$($param), *>);
     };
 
-    ($trait:tt<$($param:tt: $constraint:tt), *>) => {
-as_boxed!(impl Hash for $trait<$($param: $constraint), *>);
-boxed_value_trait!($trait<$($param: $constraint), *>);
+    ($trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Hash for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
+boxed_value_trait!($trait<$($param: $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Hash for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
+boxed_value_trait!($trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Hash for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
+boxed_value_trait!($trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Hash for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
+boxed_value_trait!($trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
     };
 }
 
@@ -53,6 +68,7 @@ mod tests {
     use crate::*;
     use super::*;
     use std::collections::HashMap;
+    use std::fmt::Debug;
 
     trait K1<K: KeyConstraint>: Key {
         fn say(&self, _k: K) { }
@@ -105,4 +121,48 @@ mod tests {
         assert_eq!(&value, map.get(&key).unwrap());
     }
 
+    trait SomeType0<K: KeyConstraint, V: ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType0<K, V>);
+    as_trait!(SomeType0<K, V>);
+    }
+
+boxed_key_trait!(SomeType0<K: KeyConstraint, V: ValueConstraint>);
+
+    trait SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType1<K, V>);
+    as_trait!(SomeType1<K, V>);
+    }
+
+boxed_key_trait!(SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>);
+
+     trait SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType2<K, V>);
+    as_trait!(SomeType2<K, V>);
+    }
+
+boxed_key_trait!(SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+
+     trait SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType3<K, V>);
+    as_trait!(SomeType3<K, V>);
+    }
+
+boxed_key_trait!(SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+
+     trait SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType4<K, V>);
+    as_trait!(SomeType4<K, V>);
+    }
+
+boxed_key_trait!(SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
 }

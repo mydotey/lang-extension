@@ -27,7 +27,7 @@ pub trait TypeConverter<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint
 as_boxed!(TypeConverter<S, T>);
 }
 
-boxed_value_trait!(TypeConverter<S: ValueConstraint, T: ValueConstraint>);
+boxed_value_trait!(TypeConverter<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint>);
 
 #[macro_export]
 macro_rules! raw_type_converter {
@@ -43,7 +43,7 @@ macro_rules! raw_type_converter {
     fn convert_raw(&self, source: &dyn Value) -> Result<Box<dyn Value>, Box<dyn Value>> {
         match source.as_any_ref().downcast_ref::<$source_type>() {
             Some(s) => {
-                match crate::convert::TypeConverter::convert(self, s) {
+                match $crate::convert::TypeConverter::convert(self, s) {
                     Ok(t) => Ok(Value::to_boxed(*t)),
                     Err(err) => Err(err)
                 }
@@ -58,7 +58,7 @@ as_boxed!(impl RawTypeConverter);
     };
 
     ($type: ty, $source_type: ty, $target_type: ty) => {
-impl crate::convert::RawTypeConverter for $type {
+impl $crate::convert::RawTypeConverter for $type {
 raw_type_converter!($source_type, $target_type);
 }
 
@@ -69,7 +69,7 @@ unsafe impl Send for $type { }
 
     ($type: tt<$source_type:tt, $target_type:tt>) => {
 impl<$source_type: ?Sized + ValueConstraint, $target_type: ?Sized + ValueConstraint>
-    crate::convert::RawTypeConverter for $type<$source_type, $target_type> {
+    $crate::convert::RawTypeConverter for $type<$source_type, $target_type> {
 raw_type_converter!($source_type, $target_type);
 }
 

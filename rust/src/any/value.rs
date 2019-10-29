@@ -42,10 +42,28 @@ as_boxed!(impl Eq for $trait<$($param), *>);
 as_boxed!(impl Clone for $trait<$($param), *>);
     };
 
-    ($trait:tt<$($param:tt: $constraint:tt), *>) => {
-as_boxed!(impl PartialEq for $trait<$($param: $constraint), *>);
-as_boxed!(impl Eq for $trait<$($param: $constraint), *>);
-as_boxed!(impl Clone for $trait<$($param: $constraint), *>);
+    ($trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Eq for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Clone for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Eq for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Clone for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Eq for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Clone for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
+    };
+
+    ($trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl PartialEq for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Eq for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
+as_boxed!(impl Clone for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
     };
 }
 
@@ -111,4 +129,48 @@ mod tests {
         assert_eq!(&s.clone_boxed(), &s.to_boxed());
     }
 
+    trait SomeType0<K: KeyConstraint, V: ValueConstraint>: Value {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType0<K, V>);
+    as_trait!(SomeType0<K, V>);
+    }
+
+boxed_value_trait!(SomeType0<K: KeyConstraint, V: ValueConstraint>);
+
+    trait SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>: Value {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType1<K, V>);
+    as_trait!(SomeType1<K, V>);
+    }
+
+boxed_value_trait!(SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>);
+
+     trait SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Value {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType2<K, V>);
+    as_trait!(SomeType2<K, V>);
+    }
+
+boxed_value_trait!(SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+
+     trait SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>: Value {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType3<K, V>);
+    as_trait!(SomeType3<K, V>);
+    }
+
+boxed_value_trait!(SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+
+     trait SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>: Value {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType4<K, V>);
+    as_trait!(SomeType4<K, V>);
+    }
+
+boxed_value_trait!(SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
 }

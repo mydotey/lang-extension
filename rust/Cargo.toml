@@ -1,6 +1,6 @@
 [package]
 name = "lang_extension"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Qiang Zhao <koqizhao@outlook.com>"]
 description = "Rust Lang Extension"
 edition = "2018"

@@ -49,15 +49,39 @@ impl<$($param), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
 }
     };
 
-    (impl Hash for $trait:tt<$($param:tt: $constraint:tt), *>) => {
-impl<$($param: $constraint), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
+    (impl Hash for $trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: $constraint0 $(+ $constraint)*), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         state.write_u64(self.as_ref().hashcode());
     }
 }
     };
 
-     (impl PartialEq for $trait:tt) => {
+    (impl Hash for $trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: ?Sized + $constraint0 $(+ $constraint)*), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u64(self.as_ref().hashcode());
+    }
+}
+    };
+
+    (impl Hash for $trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + $constraint0 $(+ $constraint)*), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u64(self.as_ref().hashcode());
+    }
+}
+    };
+
+    (impl Hash for $trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *> std::hash::Hash for Box<dyn $trait<$($param), *>> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u64(self.as_ref().hashcode());
+    }
+}
+    };
+
+    (impl PartialEq for $trait:tt) => {
 impl PartialEq for Box<dyn $trait> {
     fn eq(&self, other: &Self) -> bool {
         self.as_ref().equals(other.as_ref().as_any_ref())
@@ -73,8 +97,32 @@ impl<$($param), *> PartialEq for Box<dyn $trait<$($param), *>> {
 }
     };
 
-    (impl PartialEq for $trait:tt<$($param:tt: $constraint:tt), *>) => {
-impl<$($param: $constraint), *> PartialEq for Box<dyn $trait<$($param), *>> {
+    (impl PartialEq for $trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: $constraint0 $(+ $constraint)*), *> PartialEq for Box<dyn $trait<$($param), *>> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref().equals(other.as_ref().as_any_ref())
+    }
+}
+    };
+
+    (impl PartialEq for $trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: ?Sized + $constraint0 $(+ $constraint)*), *> PartialEq for Box<dyn $trait<$($param), *>> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref().equals(other.as_ref().as_any_ref())
+    }
+}
+    };
+
+    (impl PartialEq for $trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + $constraint0 $(+ $constraint)*), *> PartialEq for Box<dyn $trait<$($param), *>> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_ref().equals(other.as_ref().as_any_ref())
+    }
+}
+    };
+
+    (impl PartialEq for $trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *> PartialEq for Box<dyn $trait<$($param), *>> {
     fn eq(&self, other: &Self) -> bool {
         self.as_ref().equals(other.as_ref().as_any_ref())
     }
@@ -89,8 +137,20 @@ impl Eq for Box<dyn $trait> { }
 impl<$($param), *> Eq for Box<dyn $trait<$($param), *>> { }
     };
 
-    (impl Eq for $trait:tt<$($param:tt: $constraint:tt), *>) => {
-impl<$($param: $constraint), *> Eq for Box<dyn $trait<$($param), *>> { }
+    (impl Eq for $trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: $constraint0 $(+ $constraint)*), *> Eq for Box<dyn $trait<$($param), *>> { }
+    };
+
+    (impl Eq for $trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: ?Sized + $constraint0 $(+ $constraint)*), *> Eq for Box<dyn $trait<$($param), *>> { }
+    };
+
+    (impl Eq for $trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + $constraint0 $(+ $constraint)*), *> Eq for Box<dyn $trait<$($param), *>> { }
+    };
+
+    (impl Eq for $trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *> Eq for Box<dyn $trait<$($param), *>> { }
     };
 
     (impl Clone for $trait:tt) => {
@@ -109,8 +169,32 @@ impl<$($param), *> Clone for Box<dyn $trait<$($param), *>> {
 }
     };
 
-    (impl Clone for $trait:tt<$($param:tt: $constraint:tt), *>) => {
-impl<$($param: $constraint), *> Clone for Box<dyn $trait<$($param), *>> {
+    (impl Clone for $trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: $constraint0 $(+ $constraint)*), *> Clone for Box<dyn $trait<$($param), *>> {
+    fn clone(&self) -> Self {
+        $trait::clone_boxed(self.as_ref())
+    }
+}
+    };
+
+    (impl Clone for $trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: ?Sized + $constraint0 $(+ $constraint)*), *> Clone for Box<dyn $trait<$($param), *>> {
+    fn clone(&self) -> Self {
+        $trait::clone_boxed(self.as_ref())
+    }
+}
+    };
+
+    (impl Clone for $trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + $constraint0 $(+ $constraint)*), *> Clone for Box<dyn $trait<$($param), *>> {
+    fn clone(&self) -> Self {
+        $trait::clone_boxed(self.as_ref())
+    }
+}
+    };
+
+    (impl Clone for $trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+impl<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *> Clone for Box<dyn $trait<$($param), *>> {
     fn clone(&self) -> Self {
         $trait::clone_boxed(self.as_ref())
     }
@@ -158,6 +242,7 @@ mod tests {
     use crate::*;
     use std::marker::*;
     use crate::any::*;
+    use std::fmt::Debug;
 
     trait SomeType: Key {
         fn say(&self);
@@ -263,4 +348,51 @@ mod tests {
     as_trait!(impl SomeType3<K, V>);
     }
 
+    trait SomeType4<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType4<K, V>);
+    as_trait!(SomeType4<K, V>);
+    }
+
+    as_boxed!(impl Hash for SomeType4<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+    as_boxed!(impl PartialEq for SomeType4<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+    as_boxed!(impl Eq for SomeType4<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+    as_boxed!(impl Clone for SomeType4<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+
+    trait SomeType5<K: 'static + KeyConstraint, V: 'static + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType5<K, V>);
+    as_trait!(SomeType5<K, V>);
+    }
+
+    as_boxed!(impl Hash for SomeType5<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+    as_boxed!(impl PartialEq for SomeType5<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+    as_boxed!(impl Eq for SomeType5<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+    as_boxed!(impl Clone for SomeType5<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+
+    trait SomeType6<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType6<K, V>);
+    as_trait!(SomeType6<K, V>);
+    }
+
+    as_boxed!(impl Hash for SomeType6<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl PartialEq for SomeType6<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl Eq for SomeType6<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl Clone for SomeType6<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
+
+    trait SomeType7<K: 'static + ?Sized + KeyConstraint + Debug, V: 'static + ?Sized + ValueConstraint>: Key {
+        fn say(&self, k: K, v: V);
+
+    as_boxed!(SomeType7<K, V>);
+    as_trait!(SomeType7<K, V>);
+    }
+
+    as_boxed!(impl Hash for SomeType7<K: 'static + ?Sized + KeyConstraint + Debug, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl PartialEq for SomeType7<K: 'static + ?Sized + KeyConstraint + Debug, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl Eq for SomeType7<K: 'static + ?Sized + KeyConstraint + Debug, V: 'static + ?Sized + ValueConstraint>);
+    as_boxed!(impl Clone for SomeType7<K: 'static + ?Sized + KeyConstraint + Debug, V: 'static + ?Sized + ValueConstraint>);
 }

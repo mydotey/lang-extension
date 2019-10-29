@@ -21,7 +21,7 @@ pub trait ValueFilter<V: ?Sized + ValueConstraint>: RawValueFilter {
 as_boxed!(ValueFilter<V>);
 }
 
-boxed_value_trait!(ValueFilter<V: ValueConstraint>);
+boxed_value_trait!(ValueFilter<V: ?Sized + ValueConstraint>);
 
 #[derive(Clone)]
 pub struct DefaultValueFilter<V: ?Sized + ValueConstraint> {
