@@ -118,7 +118,7 @@ impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> Eq for DefaultTyp
 
 impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> fmt::Debug for DefaultTypeConverter<S, T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {{ source_type: {}, target_type: {}, converter: {}",
+        write!(f, "{} {{ source_type: {}, target_type: {}, converter: {} }}",
             type_name::<DefaultTypeConverter<S, T>>(),
             type_name::<S>(), type_name::<T>(),
             type_name::<FunctionRef<S, Result<T, Box<dyn Value>>>>())
@@ -126,6 +126,12 @@ impl<S: ?Sized + ValueConstraint, T: ?Sized + ValueConstraint> fmt::Debug for De
 }
 
 raw_type_converter!(DefaultTypeConverter<S, T>);
+
+pub type InplaceTypeConverter<V> = dyn TypeConverter<V, V>;
+
+pub fn new_inplace_type_converter<V: ?Sized + ValueConstraint>() -> Box<InplaceTypeConverter<V>> {
+    TypeConverter::to_boxed(DefaultTypeConverter::<V, V>::new(Box::new(|v|Ok(Box::new(v.clone())))))
+}
 
 #[cfg(test)]
 mod tests {
