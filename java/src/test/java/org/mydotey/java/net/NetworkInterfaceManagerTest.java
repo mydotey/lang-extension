@@ -11,8 +11,10 @@ public class NetworkInterfaceManagerTest {
 
     @Test
     public void showInterfaceInfo() {
-        System.out.printf("ip: %s\n", NetworkInterfaceManager.INSTANCE.localhostIP());
-        System.out.printf("host: %s\n", NetworkInterfaceManager.INSTANCE.localhostName());
+        //System.setProperty("host.ip", "192.168.56.11");
+        //System.setProperty("host.name", "my-mac");
+        System.out.printf("ip: %s\n", NetworkInterfaceManager.INSTANCE.hostIP());
+        System.out.printf("host: %s\n", NetworkInterfaceManager.INSTANCE.hostName());
     }
 
 }

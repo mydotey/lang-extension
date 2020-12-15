@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.mydotey.java.StringExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,45 +19,51 @@ public final class NetworkInterfaceManager {
 
     public static final NetworkInterfaceManager INSTANCE = new NetworkInterfaceManager();
 
-    private InetAddress _localIP;
-
-    private String _localhostIP;
-    private String _localhostName;
+    private String _hostIP;
+    private String _hostName;
 
     private NetworkInterfaceManager() {
-        try {
-            _localIP = getLocalIP();
-            if (_localIP == null)
-                throw new RuntimeException("Cannot find local ipv4 address!");
+        _hostIP = StringExtension.trim(System.getProperty("host.ip"));
+        _hostName = StringExtension.trim(System.getProperty("host.name"));
 
-            _localhostIP = _localIP.getHostAddress();
-            _localhostName = getLocalHostName();
+        InetAddress localIP = null;
+        try {
+            localIP = getLocalIP();
         } catch (Throwable ex) {
-            _logger.error("IPv4 address or local hostName init failed!", ex);
+            _logger.error("IPv4 address or local hostName auto find failed!", ex);
         }
+
+        if (StringExtension.isBlank(_hostIP) && localIP != null)
+            _hostIP = localIP.getHostAddress();
+
+        if (StringExtension.isBlank(_hostName)) {
+            try {
+                _hostName = InetAddress.getLocalHost().getHostName();
+            } catch (Throwable ex) {
+                _logger.error("Cannot get hostName from InetAddress.getLocalHost().", ex);
+            }
+        }
+        if (StringExtension.isBlank(_hostName) && localIP != null)
+            _hostName = localIP.getHostName();
+        if (StringExtension.isBlank(_hostName))
+            _hostName = _hostIP;
+
+        _logger.info("{} use: { hostIP: {}, hostName: {} }", NetworkInterfaceManager.class.getSimpleName(), _hostIP,
+            _hostName);
     }
 
-    public String localhostIP() {
-        if (_localhostIP == null)
+    public String hostIP() {
+        if (_hostIP == null)
             throw new RuntimeException("Cannot find local ipv4 address!");
 
-        return _localhostIP;
+        return _hostIP;
     }
 
-    public String localhostName() {
-        if (_localhostName == null)
+    public String hostName() {
+        if (_hostName == null)
             throw new RuntimeException("Cannot find local hostName!");
 
-        return _localhostName;
-    }
-
-    private String getLocalHostName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (Throwable ex) {
-            _logger.error("Cannot get hostName from InetAddress.getLocalHost(), use ip instead.", ex);
-            return _localIP.getHostName();
-        }
+        return _hostName;
     }
 
     private InetAddress getLocalIP() throws SocketException, UnknownHostException {
