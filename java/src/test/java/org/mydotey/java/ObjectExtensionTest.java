@@ -3,7 +3,9 @@ package org.mydotey.java;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -182,6 +184,90 @@ public class ObjectExtensionTest {
         obj.put("", "");
         String name = "arg";
         ObjectExtension.requireNonEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty() {
+        Object obj = new Object();
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(name + " is null or empty");
+        obj = null;
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty2() {
+        String obj = "test";
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(name + " is null or empty");
+        obj = "  ";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty3() {
+        List<?> obj = Arrays.asList(1, 2);
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(name + " is null or empty");
+        obj = new ArrayList<>();
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty4() {
+        Map<?, ?> obj = Collections.singletonMap("k", "v");
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(name + " is null or empty");
+        obj = new HashMap<>();
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty5() {
+        Object[] obj = new Object[] { 1, 2 };
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(name + " is null or empty");
+        obj = new Object[] {};
+        ObjectExtension.requireNonNullOrEmpty(obj, name);
+    }
+
+    @Test
+    public void requireNonNullOrEmpty6() {
+        String name = "arg";
+        ObjectExtension.requireNonNullOrEmpty(0, name);
+        ObjectExtension.requireNonNullOrEmpty(0.0, name);
+        ObjectExtension.requireNonNullOrEmpty(false, name);
+        ObjectExtension.requireNonNullOrEmpty(1, name);
+        ObjectExtension.requireNonNullOrEmpty(new Object(), name);
+    }
+
+    @Test
+    public void isNullOrEmpty() {
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty(null));
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty(""));
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty("  "));
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty(new ArrayList<>()));
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty(new HashMap<>()));
+        Assert.assertTrue(ObjectExtension.isNullOrEmpty(new Object[0]));
+        Assert.assertFalse(ObjectExtension.isNullOrEmpty(0));
+        Assert.assertFalse(ObjectExtension.isNullOrEmpty(0.0));
+        Assert.assertFalse(ObjectExtension.isNullOrEmpty(false));
+        Assert.assertFalse(ObjectExtension.isNullOrEmpty(new Object()));
     }
 
 }

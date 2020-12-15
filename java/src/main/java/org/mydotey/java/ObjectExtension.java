@@ -1,5 +1,6 @@
 package org.mydotey.java;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
@@ -44,6 +45,31 @@ public interface ObjectExtension {
     static void requireNonBlank(String obj, String name) {
         if (StringExtension.isBlank(obj))
             throw new IllegalArgumentException(name + " is blank");
+    }
+
+    static void requireNonNullOrEmpty(Object obj, String name) {
+        if (isNullOrEmpty(obj))
+            throw new IllegalArgumentException(name + " is null or empty");
+    }
+
+    @SuppressWarnings("rawtypes")
+    static boolean isNullOrEmpty(Object obj) {
+        if (obj == null)
+            return true;
+
+        if (obj instanceof String)
+            return StringExtension.isBlank((String) obj);
+
+        if (obj instanceof Collection)
+            return ((Collection) obj).isEmpty();
+
+        if (obj instanceof Map)
+            return ((Map) obj).isEmpty();
+
+        if (obj.getClass().isArray())
+            return Array.getLength(obj) == 0;
+
+        return false;
     }
 
 }
