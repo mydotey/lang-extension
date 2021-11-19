@@ -190,6 +190,31 @@ public class StringExtensionTest {
         expected = StringExtension.EMPTY;
         actual = StringExtension.trim(data, chars);
         Assert.assertEquals(expected, actual);
+
+        data = " ";
+        expected = StringExtension.EMPTY;
+        actual = StringExtension.trim(data);
+        Assert.assertEquals(expected, actual);
+
+        data = " ok";
+        expected = "ok";
+        actual = StringExtension.trim(data);
+        Assert.assertEquals(expected, actual);
+
+        data = "ok ";
+        expected = "ok";
+        actual = StringExtension.trim(data);
+        Assert.assertEquals(expected, actual);
+
+        data = "ok";
+        expected = "ok";
+        actual = StringExtension.trim(data);
+        Assert.assertEquals(expected, actual);
+
+        data = StringExtension.EMPTY;
+        expected = StringExtension.EMPTY;
+        actual = StringExtension.trim(data);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -253,6 +278,26 @@ public class StringExtensionTest {
         expected = StringExtension.EMPTY;
         actual = StringExtension.trimStart(data, chars);
         Assert.assertEquals(expected, actual);
+
+        data = " ok ";
+        expected = "ok ";
+        actual = StringExtension.trimStart(data);
+        Assert.assertEquals(expected, actual);
+
+        data = "ok ";
+        expected = "ok ";
+        actual = StringExtension.trimStart(data);
+        Assert.assertEquals(expected, actual);
+
+        data = "ok";
+        expected = "ok";
+        actual = StringExtension.trimStart(data);
+        Assert.assertEquals(expected, actual);
+
+        data = StringExtension.EMPTY;
+        expected = StringExtension.EMPTY;
+        actual = StringExtension.trimStart(data);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -315,6 +360,26 @@ public class StringExtensionTest {
         chars = new char[] { 't', 'e', 's', '1', '2' };
         expected = StringExtension.EMPTY;
         actual = StringExtension.trimEnd(data, chars);
+        Assert.assertEquals(expected, actual);
+
+        data = " ok ";
+        expected = " ok";
+        actual = StringExtension.trimEnd(data);
+        Assert.assertEquals(expected, actual);
+
+        data = " ok";
+        expected = " ok";
+        actual = StringExtension.trimEnd(data);
+        Assert.assertEquals(expected, actual);
+
+        data = "ok";
+        expected = "ok";
+        actual = StringExtension.trimEnd(data);
+        Assert.assertEquals(expected, actual);
+
+        data = StringExtension.EMPTY;
+        expected = StringExtension.EMPTY;
+        actual = StringExtension.trimEnd(data);
         Assert.assertEquals(expected, actual);
     }
 

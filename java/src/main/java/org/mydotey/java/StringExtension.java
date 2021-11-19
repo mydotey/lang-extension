@@ -67,10 +67,27 @@ public interface StringExtension {
         return s1.equalsIgnoreCase(s2);
     }
 
+    static String trim(String s) {
+        if (s == null)
+            return null;
+        return s.trim();
+    }
+
     static String trim(String s, char... chars) {
         s = trimStart(s, chars);
         s = trimEnd(s, chars);
         return s;
+    }
+
+    static String trimEnd(String s) {
+        if (s == null)
+            return s;
+        char[] chars = s.toCharArray();
+        int st = chars.length - 1;
+        while (st >= 0 && chars[st] <= ' ') {
+            st--;
+        }
+        return st < 0 ? EMPTY : s.substring(0, st + 1);
     }
 
     static String trimEnd(String s, char... chars) {
@@ -96,6 +113,17 @@ public interface StringExtension {
             return s;
 
         return index < 0 ? EMPTY : s.substring(0, index + 1);
+    }
+
+    static String trimStart(String s) {
+        if (s == null)
+            return s;
+        char[] chars = s.toCharArray();
+        int st = 0;
+        while (st < chars.length && chars[st] <= ' ') {
+            st++;
+        }
+        return st == chars.length ? EMPTY : s.substring(st);
     }
 
     static String trimStart(String s, char... chars) {
