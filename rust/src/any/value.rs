@@ -1,31 +1,31 @@
-use std::fmt::Debug;
 use std::any::Any;
+use std::fmt::Debug;
 
 use super::*;
 
-pub trait ValueConstraint: 'static + PartialEq + Eq + Debug + Clone { }
+pub trait ValueConstraint: 'static + PartialEq + Eq + Debug + Clone {}
 
-impl<T: 'static + ?Sized + PartialEq + Eq + Debug + Clone> ValueConstraint for T { }
+impl<T: 'static + ?Sized + PartialEq + Eq + Debug + Clone> ValueConstraint for T {}
 
 pub trait Value: Any + AnyExtension + AsAny + Debug {
     fn equals(&self, other: &dyn Any) -> bool {
         self.reference_equals(other)
     }
 
-as_trait!(Value);
-as_boxed!(Value);
+    as_trait!(Value);
+    as_boxed!(Value);
 }
 
 impl<T: ?Sized + ValueConstraint> Value for T {
     fn equals(&self, other: &dyn Any) -> bool {
         match other.downcast_ref::<T>() {
             Some(r) => *self == *r,
-            None => false
+            None => false,
         }
     }
- 
-as_trait!(impl Value);
-as_boxed!(impl Value);
+
+    as_trait!(impl Value);
+    as_boxed!(impl Value);
 }
 
 #[macro_export]
@@ -69,6 +69,7 @@ as_boxed!(impl Clone for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $c
 
 boxed_value_trait!(Value);
 
+#[allow(dead_code)]
 #[cfg(test)]
 mod tests {
 
@@ -77,15 +78,12 @@ mod tests {
     #[derive(PartialEq, Eq, Debug, Clone)]
     struct S1 {
         a: i32,
-        b: u32
+        b: u32,
     }
 
     #[test]
     fn eq() {
-        let s = S1 {
-            a: 1,
-            b: 2
-        };
+        let s = S1 { a: 1, b: 2 };
         let t: Box<dyn Value> = Box::new(s.clone());
         let t2: Box<dyn Value> = Box::new(s.clone());
         assert!(t == t2);
@@ -93,20 +91,14 @@ mod tests {
 
     #[test]
     fn debug() {
-        let s = S1 {
-            a: 1,
-            b: 2
-        };
+        let s = S1 { a: 1, b: 2 };
         let t: Box<dyn Value> = Box::new(s);
         println!("{:?}", t);
     }
 
     #[test]
     fn clone() {
-        let s = S1 {
-            a: 1,
-            b: 2
-        };
+        let s = S1 { a: 1, b: 2 };
         let b = s.clone_boxed();
         assert_eq!(type_name::<S1>(), b.as_ref().type_name());
         assert_eq!(type_name::<Box<dyn Value>>(), b.type_name());
@@ -115,10 +107,7 @@ mod tests {
 
     #[test]
     fn as_trait_as_boxed() {
-        let s = S1 {
-            a: 1,
-            b: 2
-        };
+        let s = S1 { a: 1, b: 2 };
         s.as_trait_ref();
 
         println!("{:p}", s.as_trait_ref() as &dyn Value);
@@ -132,45 +121,47 @@ mod tests {
     trait SomeType0<K: KeyConstraint, V: ValueConstraint>: Value {
         fn say(&self, k: K, v: V);
 
-    as_boxed!(SomeType0<K, V>);
-    as_trait!(SomeType0<K, V>);
+        as_boxed!(SomeType0<K, V>);
+        as_trait!(SomeType0<K, V>);
     }
 
-boxed_value_trait!(SomeType0<K: KeyConstraint, V: ValueConstraint>);
+    boxed_value_trait!(SomeType0<K: KeyConstraint, V: ValueConstraint>);
 
     trait SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>: Value {
         fn say(&self, k: K, v: V);
 
-    as_boxed!(SomeType1<K, V>);
-    as_trait!(SomeType1<K, V>);
+        as_boxed!(SomeType1<K, V>);
+        as_trait!(SomeType1<K, V>);
     }
 
-boxed_value_trait!(SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>);
+    boxed_value_trait!(SomeType1<K: KeyConstraint + Debug, V: ValueConstraint>);
 
-     trait SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Value {
+    trait SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>: Value {
         fn say(&self, k: K, v: V);
 
-    as_boxed!(SomeType2<K, V>);
-    as_trait!(SomeType2<K, V>);
+        as_boxed!(SomeType2<K, V>);
+        as_trait!(SomeType2<K, V>);
     }
 
-boxed_value_trait!(SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
+    boxed_value_trait!(SomeType2<K: ?Sized + KeyConstraint, V: ?Sized + ValueConstraint>);
 
-     trait SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>: Value {
+    trait SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>: Value {
         fn say(&self, k: K, v: V);
 
-    as_boxed!(SomeType3<K, V>);
-    as_trait!(SomeType3<K, V>);
+        as_boxed!(SomeType3<K, V>);
+        as_trait!(SomeType3<K, V>);
     }
 
-boxed_value_trait!(SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
+    boxed_value_trait!(SomeType3<K: 'static + KeyConstraint, V: 'static + ValueConstraint>);
 
-     trait SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>: Value {
+    trait SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>:
+        Value
+    {
         fn say(&self, k: K, v: V);
 
-    as_boxed!(SomeType4<K, V>);
-    as_trait!(SomeType4<K, V>);
+        as_boxed!(SomeType4<K, V>);
+        as_trait!(SomeType4<K, V>);
     }
 
-boxed_value_trait!(SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
+    boxed_value_trait!(SomeType4<K: 'static + ?Sized + KeyConstraint, V: 'static + ?Sized + ValueConstraint>);
 }

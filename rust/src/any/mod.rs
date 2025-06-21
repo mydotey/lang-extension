@@ -1,8 +1,7 @@
-use std::any::{ Any, type_name };
+use std::any::{Any, type_name};
 
 #[macro_use]
 mod as_macro;
-pub use as_macro::*;
 
 #[macro_use]
 mod value;
@@ -16,11 +15,9 @@ mod immutable;
 pub use immutable::*;
 
 pub trait AsAny {
-
     fn as_any_ref(&self) -> &dyn Any;
 
     fn as_any_mut(&mut self) -> &mut dyn Any;
-
 }
 
 impl<T: 'static> AsAny for T {
@@ -71,16 +68,24 @@ mod tests {
     #[test]
     fn any_extension() {
         let a: Box<dyn Any> = Box::new(10);
-        println!("type_name: {}, memory_address: {:?}",
-            a.as_ref().type_name(), a.as_ref().memory_address());
+        println!(
+            "type_name: {}, memory_address: {:?}",
+            a.as_ref().type_name(),
+            a.as_ref().memory_address()
+        );
 
         assert_eq!(type_name::<i32>(), 10.type_name());
         assert_eq!(type_name::<dyn Any>(), a.as_ref().type_name());
         assert_eq!(type_name::<Box<dyn Any>>(), a.type_name());
 
-        assert_eq!(a.as_ref().downcast_ref::<i32>().unwrap() as *const i32 as usize,
-            a.as_ref().memory_address());
-        assert_eq!(&a as *const Box::<dyn Any> as *const () as usize, a.memory_address());
+        assert_eq!(
+            a.as_ref().downcast_ref::<i32>().unwrap() as *const i32 as usize,
+            a.as_ref().memory_address()
+        );
+        assert_eq!(
+            &a as *const Box::<dyn Any> as *const () as usize,
+            a.memory_address()
+        );
 
         let b: Box<dyn Any> = Box::new(10);
         assert!(!a.reference_equals(b.as_any_ref()));
@@ -94,5 +99,4 @@ mod tests {
         assert!(!x.reference_equals(y.as_any_ref()));
         assert!(!x.as_ref().reference_equals(y.as_ref().as_any_ref()));
     }
-
 }

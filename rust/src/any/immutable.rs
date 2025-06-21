@@ -4,7 +4,7 @@ use super::*;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct ImmutableValue {
-    value: Arc<Box<dyn Value>>
+    value: Arc<Box<dyn Value>>,
 }
 
 impl ImmutableValue {
@@ -14,27 +14,22 @@ impl ImmutableValue {
 
     pub fn wrap(value: Box<dyn Value>) -> Self {
         ImmutableValue {
-            value: Arc::new(value)
+            value: Arc::new(value),
         }
     }
 
     pub fn raw_boxed(&self) -> Box<dyn Value> {
         self.value.as_ref().clone()
     }
-
 }
 
-unsafe impl Send for ImmutableValue {
+unsafe impl Send for ImmutableValue {}
 
-}
-
-unsafe impl Sync for ImmutableValue {
-
-}
+unsafe impl Sync for ImmutableValue {}
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone)]
 pub struct ImmutableKey {
-    key: Arc<Box<dyn Key>>
+    key: Arc<Box<dyn Key>>,
 }
 
 impl ImmutableKey {
@@ -44,29 +39,24 @@ impl ImmutableKey {
 
     pub fn wrap(value: Box<dyn Key>) -> Self {
         ImmutableKey {
-            key: Arc::new(value)
+            key: Arc::new(value),
         }
     }
 
     pub fn raw_boxed(&self) -> Box<dyn Key> {
         self.key.as_ref().clone()
     }
-
 }
 
-unsafe impl Send for ImmutableKey {
+unsafe impl Send for ImmutableKey {}
 
-}
-
-unsafe impl Sync for ImmutableKey {
-
-}
+unsafe impl Sync for ImmutableKey {}
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::hash::{ Hash, Hasher };
     use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
     use std::thread;
 
     #[test]
@@ -80,7 +70,10 @@ mod tests {
         assert_eq!(&v, &v.clone());
 
         let b: Box<dyn Value> = Box::new("value");
-        assert_eq!(ImmutableValue::new("value"), ImmutableValue::wrap(b.clone()));
+        assert_eq!(
+            ImmutableValue::new("value"),
+            ImmutableValue::wrap(b.clone())
+        );
 
         assert_eq!(&b, &v.raw_boxed());
 
@@ -114,7 +107,6 @@ mod tests {
 
         let mut hasher = DefaultHasher::new();
         k.hash(&mut hasher);
-        hasher.finish();
+        let _ = hasher.finish();
     }
-
 }
