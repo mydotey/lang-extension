@@ -1,6 +1,6 @@
 [package]
 name = "lang_extension"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["Qiang Zhao <koqizhao@outlook.com>"]
 description = "Rust Lang Extension"
 edition = "2024"
@@ -14,4 +14,4 @@ categories = ["rust-patterns"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lazy_static="1.4.0"
+lazy_static="1.5.0"
