@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use super::*;
 
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ImmutableValue {
     value: Arc<Box<dyn Value>>,
 }

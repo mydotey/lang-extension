@@ -14,13 +14,13 @@ pub use key::*;
 mod immutable;
 pub use immutable::*;
 
-pub trait AsAny {
+pub trait AsAny: Any {
     fn as_any_ref(&self) -> &dyn Any;
 
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-impl<T: 'static> AsAny for T {
+impl<T: Any> AsAny for T {
     fn as_any_ref(&self) -> &dyn Any {
         self
     }
@@ -31,24 +31,18 @@ impl<T: 'static> AsAny for T {
 }
 
 pub trait AnyExtension {
-    fn type_name(&self) -> &'static str;
-    fn memory_address(&self) -> usize;
-    fn reference_equals(&self, other: &dyn Any) -> bool;
-}
-
-impl<T: ?Sized> AnyExtension for T {
     fn type_name(&self) -> &'static str {
         type_name::<Self>()
     }
-
     fn memory_address(&self) -> usize {
-        self as *const T as *const () as usize
+        self as *const Self as *const () as usize
     }
-
     fn reference_equals(&self, other: &dyn Any) -> bool {
         self.memory_address() == other.memory_address()
     }
 }
+
+impl<T: ?Sized> AnyExtension for T {}
 
 #[cfg(test)]
 mod tests {
@@ -58,6 +52,7 @@ mod tests {
     #[test]
     fn as_any() {
         let d = 1;
+        d.type_id();
         assert_eq!(d.as_any_ref().type_id(), TypeId::of::<i32>());
 
         let mut d = d;

@@ -3,9 +3,9 @@ use std::hash::{Hash, Hasher};
 
 use super::*;
 
-pub trait KeyConstraint: ValueConstraint + Hash {}
+pub trait KeyConstraint: ValueConstraint + Eq + Hash {}
 
-impl<T: ?Sized + ValueConstraint + Hash> KeyConstraint for T {}
+impl<T: ?Sized + ValueConstraint + Eq + Hash> KeyConstraint for T {}
 
 pub trait Key: Value {
     fn hashcode(&self) -> u64 {
@@ -30,31 +30,37 @@ impl<T: ?Sized + KeyConstraint> Key for T {
 #[macro_export]
 macro_rules! boxed_key_trait {
     ($trait:tt) => {
+as_boxed!(impl Eq for $trait);
 as_boxed!(impl Hash for $trait);
 boxed_value_trait!($trait);
     };
 
     ($trait:tt<$($param:tt), *>) => {
+as_boxed!(impl Eq for $trait<$($param), *>);
 as_boxed!(impl Hash for $trait<$($param), *>);
 boxed_value_trait!($trait<$($param), *>);
     };
 
     ($trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Eq for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Hash for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
 boxed_value_trait!($trait<$($param: $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Eq for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Hash for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
 boxed_value_trait!($trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Eq for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Hash for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
 boxed_value_trait!($trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
+as_boxed!(impl Eq for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Hash for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
 boxed_value_trait!($trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
     };

@@ -1,19 +1,20 @@
-
 use super::*;
 
 #[macro_export]
 macro_rules! inplace_converter {
     ($type:ty, $name:ident, $raw_name:ident) => {
-lazy_static! {
-    pub static ref $name: Box::<InplaceTypeConverter<$type>> =
-        new_inplace_type_converter();
-    pub static ref $raw_name: Box::<dyn RawTypeConverter> =
-        RawTypeConverter::clone_boxed($name.as_ref());
-}
+        pub static $name: std::sync::LazyLock<Box<InplaceTypeConverter<$type>>> =
+            std::sync::LazyLock::new(|| new_inplace_type_converter());
+        pub static $raw_name: std::sync::LazyLock<Box<dyn RawTypeConverter>> =
+            std::sync::LazyLock::new(|| RawTypeConverter::clone_boxed($name.as_ref()));
     };
 }
 
-inplace_converter!(String, STRING_INPLACE_CONVERTER, RAW_STRING_INPLACE_CONVERTER);
+inplace_converter!(
+    String,
+    STRING_INPLACE_CONVERTER,
+    RAW_STRING_INPLACE_CONVERTER
+);
 
 #[cfg(test)]
 mod tests {

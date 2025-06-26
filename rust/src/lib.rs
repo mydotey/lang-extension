@@ -1,17 +1,13 @@
-
-#[macro_use]
-extern crate lazy_static;
-
 pub mod any;
+pub mod convert;
 pub mod fmt;
 pub mod ops;
-pub mod convert;
 pub mod sync;
 
 #[cfg(test)]
 mod tests {
-#[macro_export]
-macro_rules! test_print {
+    #[macro_export]
+    macro_rules! test_print {
     ($($trait:tt<$literal0:literal $(+ $param:literal)+>),*) => {
         {
             println!("{}", stringify!($($literal0 $(+ $param)+),*));

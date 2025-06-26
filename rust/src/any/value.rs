@@ -3,9 +3,9 @@ use std::fmt::Debug;
 
 use super::*;
 
-pub trait ValueConstraint: 'static + PartialEq + Eq + Debug + Clone {}
+pub trait ValueConstraint: PartialEq + Debug + Clone + Any {}
 
-impl<T: 'static + ?Sized + PartialEq + Eq + Debug + Clone> ValueConstraint for T {}
+impl<T: ?Sized + PartialEq + Debug + Clone + Any> ValueConstraint for T {}
 
 pub trait Value: Any + AnyExtension + AsAny + Debug {
     fn equals(&self, other: &dyn Any) -> bool {
@@ -32,37 +32,31 @@ impl<T: ?Sized + ValueConstraint> Value for T {
 macro_rules! boxed_value_trait {
     ($trait:tt) => {
 as_boxed!(impl PartialEq for $trait);
-as_boxed!(impl Eq for $trait);
 as_boxed!(impl Clone for $trait);
     };
 
     ($trait:tt<$($param:tt), *>) => {
 as_boxed!(impl PartialEq for $trait<$($param), *>);
-as_boxed!(impl Eq for $trait<$($param), *>);
 as_boxed!(impl Clone for $trait<$($param), *>);
     };
 
     ($trait:tt<$($param:tt: $constraint0:tt $(+ $constraint:tt)*), *>) => {
 as_boxed!(impl PartialEq for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
-as_boxed!(impl Eq for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Clone for $trait<$($param: $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
 as_boxed!(impl PartialEq for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
-as_boxed!(impl Eq for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Clone for $trait<$($param: ?Sized + $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: 'static + $constraint0:tt $(+ $constraint:tt)*), *>) => {
 as_boxed!(impl PartialEq for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
-as_boxed!(impl Eq for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Clone for $trait<$($param: 'static + $constraint0 $(+ $constraint)*), *>);
     };
 
     ($trait:tt<$($param:tt: 'static + ?Sized + $constraint0:tt $(+ $constraint:tt)*), *>) => {
 as_boxed!(impl PartialEq for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
-as_boxed!(impl Eq for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
 as_boxed!(impl Clone for $trait<$($param: 'static + ?Sized + $constraint0 $(+ $constraint)*), *>);
     };
 }
