@@ -1,4 +1,3 @@
-
 #[macro_export]
 macro_rules! arc_boxed {
     ($value:tt) => {
@@ -11,8 +10,8 @@ macro_rules! arc_boxed {
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use crate::fmt::*;
+    use crate::*;
 
     #[test]
     fn arc_boxed() {

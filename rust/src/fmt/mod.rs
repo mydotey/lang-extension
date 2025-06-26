@@ -1,4 +1,4 @@
-use std::fmt::{ Display, Debug };
+use std::fmt::{Debug, Display};
 
 use super::any::*;
 
@@ -16,7 +16,11 @@ pub trait ToInstanceString {
 
 impl<T: ?Sized> ToInstanceString for T {
     fn to_instance_string(&self) -> String {
-        format!("{{ type_name: {}, memory_address: {} }}", self.type_name(), self.memory_address())
+        format!(
+            "{{ type_name: {}, memory_address: {} }}",
+            self.type_name(),
+            self.memory_address()
+        )
     }
 }
 
@@ -30,7 +34,7 @@ impl<T: Display> ToStringExtension for Option<T> {
     fn to_string(&self) -> String {
         match self {
             Some(value) => format!("Some({})", value.to_string()),
-            None => "None".to_string()
+            None => "None".to_string(),
         }
     }
 }
