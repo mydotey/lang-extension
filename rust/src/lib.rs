@@ -2,6 +2,7 @@ pub mod any;
 pub mod convert;
 pub mod fmt;
 pub mod ops;
+pub mod slice;
 pub mod sync;
 
 #[cfg(test)]
